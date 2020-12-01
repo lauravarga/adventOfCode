@@ -21,6 +21,24 @@ func multiply2020(sir []int) int {
 	return 0
 }
 
+func multiplyThree2020(sir []int) int {
+	for i := 0; i < len(sir); i++ {
+		for j := 0; j < len(sir); j++ {
+			if i != j {
+
+				for z := 0; z < len(sir); z++ {
+					if (z != j) && (z != i) {
+						if sir[i]+sir[j]+sir[z] == 2020 {
+							return sir[i] * sir[j] * sir[z]
+						}
+					}
+				}
+			}
+		}
+	}
+	return 0
+}
+
 func main() {
 	fmt.Println("hello")
 	f, err := os.Open("in1.txt")
@@ -44,5 +62,6 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%d \n", multiply2020(report))
+	fmt.Printf("multiply2: %d \n", multiply2020(report))
+	fmt.Printf("multiply3: %d \n", multiplyThree2020(report))
 }
