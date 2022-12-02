@@ -19,6 +19,8 @@ func main() {
 	i := 1
 	cals := 0
 	maxCals := 0
+	maxCalsB := 0
+	maxCalsC := 0
 	calories := make(map[int]int)
 	for scanner.Scan() {
 		txt := scanner.Text()
@@ -27,6 +29,8 @@ func main() {
 			calories[i] = cals
 			i += 1
 			if maxCals < cals {
+				maxCalsC = maxCalsB
+				maxCalsB = maxCals
 				maxCals = cals
 			}
 			cals = 0
@@ -40,4 +44,6 @@ func main() {
 	}
 	fmt.Printf("we have %v elves \n", calories)
 	fmt.Printf("max calories is: %v \n", maxCals)
+	total := maxCals + maxCalsC + maxCalsB
+	fmt.Printf("top 3 cals summed up is: %v\n", total)
 }
