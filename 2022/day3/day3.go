@@ -133,6 +133,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	sumPriorities := 0
 	for scanner.Scan() {

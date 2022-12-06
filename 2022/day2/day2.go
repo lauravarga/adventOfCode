@@ -99,6 +99,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	sum1 := 0
 	sum2 := 0
