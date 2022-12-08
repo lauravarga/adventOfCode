@@ -65,6 +65,33 @@ func move(stacks []string, line string) {
 	}
 }
 
+// advance movement
+func move2(stacks []string, line string) {
+
+	movementInstructions := strings.Split(line, " ")
+	moves, err := strconv.Atoi(movementInstructions[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	from, err := strconv.Atoi(movementInstructions[3])
+	if err != nil {
+		log.Fatal(err)
+	}
+	from = from - 1
+	to, err := strconv.Atoi(movementInstructions[5])
+	if err != nil {
+		log.Fatal(err)
+	}
+	to = to - 1
+	containers := ""
+	for i := 1; i <= moves; i += 1 {
+		fromStack := stacks[from]
+		containers = fromStack[len(fromStack)-3:] + containers
+		stacks[from] = stacks[from][0 : len(fromStack)-3]
+	}
+	stacks[to] = stacks[to] + containers
+}
+
 func main() {
 	fmt.Println("welcome to day5 2022!")
 	f, err := os.Open("in.txt")
@@ -85,7 +112,7 @@ func main() {
 			continue
 		}
 		if strings.Contains(line, "move") {
-			move(stacks, line)
+			move2(stacks, line)
 		}
 	}
 	result := ""
