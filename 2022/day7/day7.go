@@ -33,6 +33,19 @@ func computeSizes(node *Node) int {
 
 }
 
+func findDirToDelete(node *Node, space int, candidate int) int {
+
+	if (node.size >= space) && (node.children != nil) && (node.size < candidate) {
+		candidate = node.size
+	}
+	if node.children != nil {
+		for i := 0; i < len(node.children); i += 1 {
+			candidate = findDirToDelete(node.children[i], space, candidate)
+		}
+	}
+	return candidate
+}
+
 func findSmallDirs(node *Node, sum int) int {
 
 	if (node.size <= 100000) && (node.children != nil) {
@@ -111,4 +124,7 @@ func main() {
 	fmt.Printf("computed size of /: %v\n", root)
 	smallDirs := findSmallDirs(&root, 0)
 	fmt.Printf("small dirs: %v \n", smallDirs)
+	spaceNeeded := 30000000 - 70000000 + root.size
+	dirToDelete := findDirToDelete(&root, spaceNeeded, root.size)
+	fmt.Printf("this is the dir to delete: %v\n", dirToDelete)
 }
