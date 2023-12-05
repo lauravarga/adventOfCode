@@ -1,0 +1,221 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"math"
+	"os"
+	"strconv"
+	"strings"
+)
+
+type mapLine struct {
+	destination int
+	source      int
+	mapRange    int
+}
+
+type mapType struct {
+	name     string
+	mapLines []mapLine
+}
+
+var seeds []int
+var allMaps []mapType
+var seedLocation map[int]int
+
+// var allSeedsLocations []map[int]int
+
+func findSeedLocation(seed int) int {
+
+	// location := 0
+	soil := 0
+	fertilizer := 0
+	water := 0
+	light := 0
+	temperature := 0
+	humidity := 0
+	location := 0
+	found := false
+	// fmt.Printf("Looking at the map: %v \n", allMaps[0].name)
+	for j := 0; j < len(allMaps[0].mapLines); j++ {
+		if seed >= allMaps[0].mapLines[j].source && seed < allMaps[0].mapLines[j].source+allMaps[0].mapLines[j].mapRange {
+			soil = allMaps[0].mapLines[j].destination + (seed - allMaps[0].mapLines[j].source)
+			found = true
+		}
+	}
+	if !found {
+		soil = seed
+	}
+	found = false
+	// fmt.Printf("seed: %d, soil: %d\n", seed, soil)
+
+	// fmt.Printf("Looking at the map: %v \n", allMaps[1].name)
+	for j := 0; j < len(allMaps[1].mapLines); j++ {
+		if soil >= allMaps[1].mapLines[j].source && soil < allMaps[1].mapLines[j].source+allMaps[1].mapLines[j].mapRange {
+			fertilizer = allMaps[1].mapLines[j].destination + (soil - allMaps[1].mapLines[j].source)
+			found = true
+		}
+	}
+	if !found {
+		fertilizer = soil
+	}
+	found = false
+	// fmt.Printf("seed: %d, fertilizer: %d\n", seed, fertilizer)
+
+	// fmt.Printf("Looking at the map: %v \n", allMaps[2].name)
+	for j := 0; j < len(allMaps[2].mapLines); j++ {
+		if fertilizer >= allMaps[2].mapLines[j].source && fertilizer < allMaps[2].mapLines[j].source+allMaps[2].mapLines[j].mapRange {
+			water = allMaps[2].mapLines[j].destination + (fertilizer - allMaps[2].mapLines[j].source)
+			found = true
+		}
+	}
+	if !found {
+		water = fertilizer
+	}
+	found = false
+	// fmt.Printf("seed: %d, water: %d\n", seed, water)
+
+	// fmt.Printf("Looking at the map: %v \n", allMaps[3].name)
+	for j := 0; j < len(allMaps[3].mapLines); j++ {
+		if water >= allMaps[3].mapLines[j].source && water < allMaps[3].mapLines[j].source+allMaps[3].mapLines[j].mapRange {
+			light = allMaps[3].mapLines[j].destination + (water - allMaps[3].mapLines[j].source)
+			found = true
+		}
+	}
+	if !found {
+		light = water
+	}
+	found = false
+	// fmt.Printf("seed: %d, light: %d\n", seed, light)
+
+	// fmt.Printf("Looking at the map: %v \n", allMaps[4].name)
+	for j := 0; j < len(allMaps[4].mapLines); j++ {
+		if light >= allMaps[4].mapLines[j].source && light < allMaps[4].mapLines[j].source+allMaps[4].mapLines[j].mapRange {
+			temperature = allMaps[4].mapLines[j].destination + (light - allMaps[4].mapLines[j].source)
+			found = true
+		}
+	}
+	if !found {
+		temperature = light
+	}
+	found = false
+	// fmt.Printf("seed: %d, temperature: %d\n", seed, temperature)
+
+	// fmt.Printf("Looking at the map: %v \n", allMaps[5].name)
+	for j := 0; j < len(allMaps[5].mapLines); j++ {
+		if temperature >= allMaps[5].mapLines[j].source && temperature < allMaps[5].mapLines[j].source+allMaps[5].mapLines[j].mapRange {
+			humidity = allMaps[5].mapLines[j].destination + (temperature - allMaps[5].mapLines[j].source)
+			found = true
+		}
+	}
+	if !found {
+		humidity = temperature
+	}
+	found = false
+	// fmt.Printf("seed: %d, humidity: %d\n", seed, humidity)
+
+	// fmt.Printf("Looking at the map: %v \n", allMaps[6].name)
+	for j := 0; j < len(allMaps[6].mapLines); j++ {
+		if humidity >= allMaps[6].mapLines[j].source && humidity < allMaps[6].mapLines[j].source+allMaps[6].mapLines[j].mapRange {
+			location = allMaps[6].mapLines[j].destination + (humidity - allMaps[6].mapLines[j].source)
+			found = true
+		}
+	}
+	if !found {
+		location = humidity
+	}
+	found = false
+	// fmt.Printf("seed: %d, location: %d\n", seed, location)
+	return location
+}
+
+func findLocations() {
+
+	for i := 0; i < len(seeds)-1; i += 2 {
+		for seed := seeds[i]; seed < seeds[i]+seeds[i+1]; seed++ {
+			seedLocation[seed] = findSeedLocation(seed)
+		}
+		seedLocation[seeds[i]] = findSeedLocation(seeds[i])
+	}
+	fmt.Printf("seeds with locations: %v\n", seedLocation)
+}
+
+func findMin() {
+	min := math.MaxInt
+	for _, location := range seedLocation {
+		// fmt.Printf("k: %v, v %v\n", seed, location)
+		if min > location {
+			min = location
+		}
+	}
+	fmt.Printf("the min location is: %d", min)
+}
+
+func main() {
+	seedLocation = make(map[int]int)
+	fmt.Println("welcome 2023! day 5!")
+	f, err := os.Open("in.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+
+	var aMap mapType
+	parseSeeds := true
+
+	newMap := false
+	firstMap := true
+	var mapLine mapLine
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		// fmt.Printf("%v\n", line)
+		if parseSeeds {
+			// fmt.Printf("Parsing the seeds\n")
+			parseSeeds = false
+			_, seedsString, _ := strings.Cut(line, ":")
+			seedsStringList := strings.Split(strings.TrimSpace(seedsString), " ")
+			for i := 0; i < len(seedsStringList); i++ {
+				temp, _ := strconv.Atoi(seedsStringList[i])
+				seeds = append(seeds, temp)
+			}
+			// fmt.Printf("these are the seeds: %v\n", seeds)
+		} else {
+			if line == "" {
+				// fmt.Printf("New map starting \n")
+				newMap = true
+				if !firstMap {
+					allMaps = append(allMaps, aMap)
+					aMap.mapLines = nil
+				}
+			} else {
+				if newMap {
+					newMap = false
+
+					aMap.name, _, _ = strings.Cut(line, " ")
+					// fmt.Printf("Starting to parse a map HEADER: %v \n", aMap.name)
+					firstMap = false
+
+				} else {
+					stringList := strings.Split(strings.TrimSpace(line), " ")
+					mapLine.destination, _ = strconv.Atoi(stringList[0])
+					mapLine.source, _ = strconv.Atoi(stringList[1])
+					mapLine.mapRange, _ = strconv.Atoi(stringList[2])
+					aMap.mapLines = append(aMap.mapLines, mapLine)
+					// fmt.Printf("Parsed map lines: %v \n", mapLine)
+				}
+
+			}
+		}
+
+	}
+	allMaps = append(allMaps, aMap)
+	fmt.Printf("Star %v\n", allMaps)
+	fmt.Printf("Now finding locations!!!\n")
+	findLocations()
+	fmt.Printf("Now finding min????\n")
+	findMin()
+}
